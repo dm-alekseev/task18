@@ -1,0 +1,24 @@
+---
+- name: Generate SSH key and copy to remote server
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Generate SSH key pair
+      openssh_keypair:
+        path: ~/.ssh/id_rsa  # Путь к файлу ключа
+        type: rsa            # Тип ключа (можно использовать dsa, ecdsa, ed25519)
+        size: 2048          # Размер ключа в битах
+      register: ssh_key
+
+    - name: Ensure the remote server is reachable
+      ping:
+      delegate_to: "{{ item }}"
+      with_items:
+        - "{{ inventory_hostname }}"
+
+    - name: Copy public key to remote server
+      authorized_key:
+        user: your_remote_user          # Замените на имя пользователя на удаленном сервере
+        state: present
+        key: "{{ ssh_key.public_key }}"
+      delegate_to: "{{ inventory_hostname }}"

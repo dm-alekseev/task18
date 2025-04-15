@@ -1,53 +1,67 @@
 ---
-- name: Update apt package index
+- name: Check if the system is using APT
+  command: which apt
+  register: apt_check
+  ignore_errors: yes
+
+- name: Check if the system is using DNF
+  command: which dnf
+  register: dnf_check
+  ignore_errors: yes
+
+- name: Install Docker on APT-based systems (Debian/Ubuntu)
   apt:
+    name:
+      - docker.io  
+    state: present
     update_cache: yes
+  when: apt_check.rc == 0
+
+
+- name: Update dnf package index
+  dnf:
+    update_cache: yes
+  when: dnf_check.rc == 0
 
 - name: Install basic utilities
-  apt:
+  dnf:
     name:
-      - vim
-      - git
-      - curl
-      - htop
-      - unzip
-      - wget
+       - vim
+       - git
+       - curl
+       - htop
+       - unzip
+       - wget
     state: present
+  when: dnf_check.rc == 0
 
-- name: Install required packages for Docker
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
-    state: present
-
-- name: Add Docker GPG key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-
-- name: Add Docker APT repository
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
-    state: present
-
-- name: Install Docker CE
-  apt:
+- name:  Set up the Docker repository
+  yum_repository:
     name: docker-ce
-    state: latest
+    description: Docker CE Stable Repository
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  when: dnf_check.rc == 0
 
+- name: Install Docker
+  dnf:
+    name: docker-ce
+    state: present
+  when: dnf_check.rc == 0
+  
 - name: Start and enable Docker service
   systemd:
     name: docker
     state: started
     enabled: yes
 
-- name: Copy Dockerfile to the server
-  copy:
-    src: ../files/Dockerfile 
-    dest: /path/to/your/app/Dockerfile
 
 - name: Build the Docker image from the Dockerfile 
-  command: docker build -t your_image_name /path/to/your/app/
+  command: docker build -t  alpine /opt/app/
+
+- name: Docker run
+  command:  sudo docker run -p 443:443 -d --rm -v certs:/etc/nginx/certs -v conf:/etc/nginx/conf.d -v html:/usr/share/nginx/html -v log:/var/log/nginx/  alpine 
+
+

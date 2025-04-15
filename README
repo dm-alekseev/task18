@@ -1,3 +1,5 @@
 task 18 ansible
 
 ansible -i hosts.txt all -m ping - Для проверки подключения
+ansible -i inventory/inventory.ini local -m ping
+

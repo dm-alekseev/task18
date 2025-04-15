@@ -1,0 +1,38 @@
+---
+- name: Install required packages for Docker
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+    state: present
+
+- name: Install Docker CE
+  apt:
+    name: docker-ce
+    state: latest
+
+- name: Start and enable Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Copy Dockerfile to the server
+  copy:
+    src: ../files/Dockerfile 
+    dest: /path/to/your/app/Dockerfile
+
+- name: Build the Docker image from the Dockerfile 
+  command: docker build -t your_image_name /path/to/your/app/

@@ -9,6 +9,9 @@
   register: dnf_check
   ignore_errors: yes
 
+
+#--- apt -----
+
 - name: Install Docker on APT-based systems (Debian/Ubuntu)
   apt:
     name:
@@ -17,6 +20,29 @@
     update_cache: yes
   when: apt_check.rc == 0
 
+- name: Update apt package index for Docker installation 
+  apt:
+    update_cache: yes
+  when: apt_check.rc == 0
+
+- name: Add Docker GPG key 
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+  when: apt_check.rc == 0
+
+- name: Add Docker APT repository  
+  apt_repository:
+     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable 
+  when: apt_check.rc == 0
+
+- name: Install Docker CE  
+  apt:
+     name: docker-ce  
+     state: latest 
+  when: apt_check.rc == 0
+
+
+#--- dnf -----
 
 - name: Update dnf package index
   dnf:

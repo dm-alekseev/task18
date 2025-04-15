@@ -1,0 +1,5 @@
+---
+- name: Run docker-compose up 
+  command:
+     cmd: docker compose up  --build
+     chdir: /opt/app 

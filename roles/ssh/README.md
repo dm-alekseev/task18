@@ -1,6 +1,8 @@
 Role Name
 =========
 
+ansible-playbook setup_ssh.yml -i inventory/inventory.ini --private-key /path/to/your/private/key.pem --user your_user
+
 A brief description of the role goes here.
 
 Requirements

@@ -3,6 +3,17 @@
   apt:
     update_cache: yes
 
+- name: Install basic utilities
+  apt:
+    name:
+      - vim
+      - git
+      - curl
+      - htop
+      - unzip
+      - wget
+    state: present
+
 - name: Install required packages for Docker
   apt:
     name:

@@ -3,6 +3,7 @@ task 18 ansible
 ansible -i hosts.txt all -m ping - Для проверки подключения
 ansible -i inventory/hosts.ini local -m ping
 
+ansible-playbook -i inventory/hosts.ini playbook.yml -l compose --ask-become-pass
 
 Для создания структуры директорий используется команда:
 ansible-galaxy init <Название>

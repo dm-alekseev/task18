@@ -1,21 +1,42 @@
 ---
+
+- name: Check if the system is using APT
+  command: which apt
+  register: apt_check
+  ignore_errors: yes
+
+- name: Check if the system is using DNF
+  command: which dnf
+  register: dnf_check
+  ignore_errors: yes
+
+    
+#---- rmp ---
 - name: Install git
   dnf:
     name: git
     state: present
+  when: dnf_check.rc == 0
+
+#--- apt ---
+- name: Install git
+  apt:
+    name: git
+    state: present
+  when: apt_check.rc == 0
 
 - name: Create a directory
   file:
      path: /opt/app 
      state: directory  
      mode: '0755'  
-
+  
 - name: Clone the repository 
   git:
     repo: 'https://github.com/dm-alekseev/alpine.git'  
     dest: /opt/app
     version: main  
-
+ 
 #- name: Start the application (if applicable)
 #  command: /path/to/destination/start.sh  # Замените на команду запуска приложения, если требуется
 

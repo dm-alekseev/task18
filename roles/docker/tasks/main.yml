@@ -11,19 +11,21 @@
 
 
 #--- apt -----
+- name: Update apt package index for Docker installation
+  apt:
+    update_cache: yes
+  when: apt_check.rc == 0
 
-- name: Install Docker on APT-based systems (Debian/Ubuntu)
+- name: Install required packages
   apt:
     name:
-      - docker.io  
+     - apt-transport-https
+     - ca-certificates
+     - curl
+     - software-properties-common
     state: present
-    update_cache: yes
   when: apt_check.rc == 0
 
-- name: Update apt package index for Docker installation 
-  apt:
-    update_cache: yes
-  when: apt_check.rc == 0
 
 - name: Add Docker GPG key 
   apt_key:
@@ -32,7 +34,13 @@
 
 - name: Add Docker APT repository  
   apt_repository:
-     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable 
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+      state: present 
+  when: apt_check.rc == 0
+
+- name: Update apt package index again
+  apt:
+    update_cache: yes
   when: apt_check.rc == 0
 
 - name: Install Docker CE  
@@ -41,6 +49,12 @@
      state: latest 
   when: apt_check.rc == 0
 
+- name: Ensure Docker service is running and enabled on boot
+  service:
+     name: docker
+     state: started
+     enabled: yes
+  when: apt_check.rc == 0       
 
 #--- dnf -----
 
@@ -82,7 +96,7 @@
     name: docker
     state: started
     enabled: yes
-
+  when: dnf_check.rc == 0
 
 - name: Build the Docker image from the Dockerfile 
   command: docker build -t  alpine /opt/app/

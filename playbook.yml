@@ -1,5 +1,5 @@
 ---
-- name: Deploy Docker application
+- name: deploy Docker app
   hosts: docker 
   become: yes
 
@@ -7,8 +7,8 @@
     - github_app
     - docker
 
-- name: Deply Docker compose
-  hosts: docker-compose 
+- name: deply docker compose
+  hosts: compose 
   become: yes
 
   roles:

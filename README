@@ -1,7 +1,7 @@
 task 18 ansible
 
 ansible -i hosts.txt all -m ping - Для проверки подключения
-ansible -i inventory/inventory.ini local -m ping
+ansible -i inventory/hosts.ini local -m ping
 
 
 Для создания структуры директорий используется команда:

@@ -1,10 +1,16 @@
 ---
 - name: Deploy Docker application
-  hosts: local 
+  hosts: docker 
+  become: yes
+
+  roles:
+    - github_app
+    - docker
+
+- name: Deply Docker compose
+  hosts: docker-compose 
   become: yes
 
   roles:
     - github_app
     - docker-compose
-    - docker
-
